@@ -1,0 +1,35 @@
+CREATE DATABASE minimarket;
+USE minimarket;
+
+CREATE TABLE produk (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  barcode VARCHAR(50) NOT NULL UNIQUE,
+  nama_produk VARCHAR(100) NOT NULL,
+  harga DECIMAL(10,2) NOT NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE transaksi (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  tanggal TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  total DECIMAL(10,2) NOT NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE transaksi_detail (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  transaksi_id INT(11) NOT NULL,
+  produk_id INT(11) NOT NULL,
+  nama_produk VARCHAR(100) NOT NULL,
+  harga DECIMAL(10,2) NOT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (transaksi_id) REFERENCES transaksi(id) ON DELETE CASCADE
+);
+
+CREATE TABLE user (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  username VARCHAR(50) NOT NULL UNIQUE,
+  password VARCHAR(50) NOT NULL,
+  level ENUM('admin','karyawan') NOT NULL,
+  PRIMARY KEY (id)
+);
