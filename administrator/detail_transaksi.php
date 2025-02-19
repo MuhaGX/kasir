@@ -1,5 +1,11 @@
 <?php
 include '../koneksi.php';
+include 'navbar.php';
+session_start();
+if (!isset($_SESSION['username']) || $_SESSION['level'] != "admin") {
+    header("Location: ../login.php");
+    exit();
+}
 
 if (!isset($_GET['id'])) {
     echo "<script>alert('ID transaksi tidak valid!'); window.location='laporan.php';</script>";
@@ -32,12 +38,16 @@ $result_detail = $conn->query($sql_detail);
         <tr>
             <th>Nama Produk</th>
             <th>Harga</th>
+            <th>Jumlah</th>
+            <th>Subtotal</th>
         </tr>
         <?php
         while ($row = $result_detail->fetch_assoc()) {
             echo "<tr>
                     <td>{$row['nama_produk']}</td>
                     <td>Rp " . number_format($row['harga'], 0, ',', '.') . "</td>
+                    <td>{$row['jumlah']}</td>
+                    <td>Rp " . number_format($row['subtotal'], 0, ',', '.') . "</td>
                   </tr>";
         }
         ?>
