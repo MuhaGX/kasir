@@ -1,23 +1,36 @@
 @echo off
 setlocal
 
-:: Ganti jika username MySQL-mu bukan 'root'
-set MYSQL_USER=root
-set MYSQL_HOST=localhost
-set MYSQL_PORT=3306
+:: === Konfigurasi Login MySQL (XAMPP) ===
+set MYSQL_BIN="C:\xampp\mysql\bin\mysql.exe"
+set DB_NAME=minimarket
+set SQL_FILE=db.sql
 
-:: Buat database jika belum ada
-echo Membuat database 'minimarket' jika belum ada...
-mysql -u%MYSQL_USER% -h%MYSQL_HOST% -P%MYSQL_PORT% -e "CREATE DATABASE IF NOT EXISTS minimarket CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
-
-:: Import file db.sql ke database minimarket
-echo Mengimpor file 'db.sql' ke database 'minimarket'...
-mysql -u%MYSQL_USER% -h%MYSQL_HOST% -P%MYSQL_PORT% minimarket < db.sql
-
-if %errorlevel% equ 0 (
-    echo ✅ Import berhasil!
-) else (
-    echo ❌ Terjadi kesalahan saat mengimpor!
+:: === Cek mysql.exe tersedia ===
+if not exist %MYSQL_BIN% (
+    echo ❌ Tidak ditemukan mysql.exe di %MYSQL_BIN%
+    echo Pastikan XAMPP sudah terinstal dan path-nya benar.
+    pause
+    exit /b
 )
 
+:: === Membuat database (jika belum ada) ===
+echo ⏳ Membuat database '%DB_NAME%' (jika belum ada)...
+%MYSQL_BIN% -u root -e "CREATE DATABASE IF NOT EXISTS %DB_NAME% CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
+if errorlevel 1 (
+    echo ❌ Gagal membuat database!
+    pause
+    exit /b
+)
+
+:: === Mengimpor file SQL ===
+echo ⏳ Mengimpor file '%SQL_FILE%' ke database '%DB_NAME%'...
+%MYSQL_BIN% -u root %DB_NAME% < %SQL_FILE%
+if errorlevel 1 (
+    echo ❌ Terjadi kesalahan saat mengimpor!
+    pause
+    exit /b
+)
+
+echo ✅ Impor selesai tanpa password!
 pause
