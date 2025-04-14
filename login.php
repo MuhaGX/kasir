@@ -15,22 +15,45 @@ if (isset($_SESSION['username'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <h2>Login</h2>
-    <?php
-    if (isset($_GET['pesan'])) {
-        echo "<p style='color:red;'>Username atau Password salah!</p>";
-    }
-    ?>
-    <form method="POST" action="proses_login.php">
-        <label>Username:</label>
-        <input type="text" name="username" required><br>
+<body class="d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title text-center mb-5 mt-5">Login</h2>
+                        
+                        <?php
+                        if (isset($_GET['pesan'])) {
+                            echo "<div class='alert alert-danger'>Username atau Password salah!</div>";
+                        }
+                        ?>
+                        
+                        <form method="POST" action="proses_login.php">
+                            <div class="mb-4">
+                                <label for="username" class="form-label">Username:</label>
+                                <input type="text" class="form-control" id="username" name="username" required>
+                            </div>
 
-        <label>Password:</label>
-        <input type="password" name="password" required><br>
+                            <div class="mb-4">
+                                <label for="password" class="form-label">Password:</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                            </div>
 
-        <button type="submit">Login</button>
-    </form>
+                            <div class="d-grid mt-5">
+                                <button type="submit" class="btn btn-primary">Login</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

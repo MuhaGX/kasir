@@ -2,94 +2,105 @@
 include '../koneksi.php';
 include 'navbar.php';
 session_start();
+
+// Cek login admin
 if (!isset($_SESSION['username']) || $_SESSION['level'] != "admin") {
     header("Location: ../login.php");
     exit();
 }
 
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (isset($_POST['tambah_produk'])) {
-        $sql = "INSERT INTO produk (nama_produk, barcode, harga) VALUES ('".$_POST['nama_produk']."', '".$_POST['barcode']."', '".$_POST['harga']."')";
-        $conn->query($sql);
-    } elseif (isset($_POST['edit_produk'])) {
-        $sql = "UPDATE produk SET nama_produk = '".$_POST['nama_produk']."', barcode = '".$_POST['barcode']."', harga = '".$_POST['harga']."' WHERE id = '".$_POST['id_produk']."'";
-        $conn->query($sql);
-    }
+// Handle tambah produk
+if (isset($_POST['tambah_produk'])) {
+    $nama = $conn->real_escape_string($_POST['nama_produk']);
+    $barcode = $conn->real_escape_string($_POST['barcode']);
+    $harga = (int)$_POST['harga'];
+    $conn->query("INSERT INTO produk (nama_produk, barcode, harga) VALUES ('$nama', '$barcode', $harga)");
 }
 
+// Handle edit produk
+if (isset($_POST['edit_produk'])) {
+    $id = (int)$_POST['id'];
+    $nama = $conn->real_escape_string($_POST['nama_produk']);
+    $barcode = $conn->real_escape_string($_POST['barcode']);
+    $harga = (int)$_POST['harga'];
+    $conn->query("UPDATE produk SET nama_produk='$nama', barcode='$barcode', harga=$harga WHERE id=$id");
+}
+
+// Handle hapus produk
 if (isset($_GET['hapus'])) {
-    $sql = "DELETE FROM produk WHERE id = '".$_GET['hapus']."'";
-    $conn->query($sql);
+    $id = (int)$_GET['hapus'];
+    $conn->query("DELETE FROM produk WHERE id=$id");
 }
 
-if (isset($_GET['id'])) {
-    $id_produk = $_GET['id'];
-    $sql = "SELECT * FROM produk WHERE id = '$id_produk'";
-    $result = $conn->query($sql);
-    $row = $result->fetch_assoc();
-}
+// Ambil data produk
+$produk = $conn->query("SELECT * FROM produk ORDER BY nama_produk");
 ?>
 
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Produk</title>
+    <title>Kelola Produk</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h2>Tambah Produk Baru</h2>
-    <form method="POST">
-        <label>Nama Produk:</label>
-        <input type="text" name="nama_produk" required><br>
+    <div class="container mt-3">
+        <h2 class="mb-3">Tambah Produk Baru</h2>
+        <form method="post" class="mb-4">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="nama_produk" placeholder="Nama Produk" required>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" class="form-control" name="barcode" placeholder="Barcode" required>
+                </div>
+                <div class="col-md-3">
+                    <input type="number" class="form-control" name="harga" placeholder="Harga" required>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100" name="tambah_produk">Tambah</button>
+                </div>
+            </div>
+        </form>
 
-        <label>Barcode:</label>
-        <input type="text" name="barcode" required><br>
+        <h2 class="mb-3">Daftar Produk</h2>
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Nama Produk</th>
+                    <th>Barcode</th>
+                    <th>Harga</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while($row = $produk->fetch_assoc()): ?>
+                <tr>
+                    <td><?= $row['id'] ?></td>
+                    <td>
+                        <form method="post" class="mb-0">
+                            <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                            <input type="text" class="form-control form-control-sm" name="nama_produk" value="<?= htmlspecialchars($row['nama_produk']) ?>">
+                    </td>
+                    <td>
+                            <input type="text" class="form-control form-control-sm" name="barcode" value="<?= htmlspecialchars($row['barcode']) ?>">
+                    </td>
+                    <td>
+                            <input type="number" class="form-control form-control-sm" name="harga" value="<?= $row['harga'] ?>">
+                    </td>
+                    <td>
+                            <button type="submit" class="btn btn-sm btn-success me-1" name="edit_produk">Simpan</button>
+                        </form>
+                        <a href="?hapus=<?= $row['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Hapus produk ini?')">Hapus</a>
+                    </td>
+                </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
+    </div>
 
-        <label>Harga:</label>
-        <input type="number" name="harga" required><br>
-
-        <button type="submit" name="tambah_produk">Tambah Produk</button>
-    </form>
-    <br>
-
-    <h2>Daftar Produk</h2>
-    <table border="1">
-        <tr>
-            <th>ID</th>
-            <th>Nama Produk</th>
-            <th>Barcode</th>
-            <th>Harga</th>
-            <th>Aksi</th>
-        </tr>
-        <?php
-        $sql = "SELECT * FROM produk";
-        $result = $conn->query($sql);
-        while ($row = $result->fetch_assoc()) {
-            ?>
-            <tr>
-                <td><?php echo $row['id']; ?></td>
-                <td><?php echo $row['nama_produk']; ?></td>
-                <td><?php echo $row['barcode']; ?></td>
-                <td>Rp <?php echo number_format($row['harga'], 0, ',', '.'); ?></td>
-                <td>
-                    <a href="?hapus=<?php echo $row['id']; ?>">Hapus</a>
-                    <form action="" method="post">
-                        <input type="hidden" name="id_produk" value="<?php echo $row['id']; ?>">
-                        <input type="text" name="nama_produk" value="<?php echo $row['nama_produk']; ?>">
-                        <input type="text" name="barcode" value="<?php echo $row['barcode']; ?>">
-                        <input type="number" name="harga" value="<?php echo $row['harga']; ?>">
-                        <input type="submit" name="edit_produk" value="Edit">
-                    </form>
-                </td>
-            </tr>
-            <?php
-        }
-        ?>
-    </table>
-
-    <br>
-    <a href="index.php">Kembali ke Kasir</a>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

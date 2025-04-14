@@ -10,15 +10,6 @@
           <a class="nav-link" href="Pembelian.php">Pembelian</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="produk.php">Produk</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="transaksi.php">Transaksi</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="kelola_user.php">Kelola Pengguna</a>
-        </li>
-        <li class="nav-item">
           <a class="nav-link" href="../logout.php">Logout</a>
         </li>
       </ul>
